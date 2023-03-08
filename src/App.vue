@@ -36,7 +36,6 @@
       <div class="player-duration">03:06</div>
     </div>
   </div>
-
   <auth />
 </template>
 
