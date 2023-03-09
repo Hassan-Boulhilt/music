@@ -67,7 +67,7 @@ export default {
     };
   },
   methods: {
-    upload(e) {
+    upload() {
       this.is_dragover = false;
     },
   },
