@@ -19,7 +19,7 @@
           @dragover.prevent.stop="is_dragover = true"
           @dragenter.prevent.stop="is_dragover = true"
           @dragleave.prevent.stop="is_dragover = false"
-          @drop.prevent.stop="upload"
+          @drop.prevent.stop="upload($event)"
         >
           <h5>Drop your files here</h5>
         </div>
@@ -67,8 +67,10 @@ export default {
     };
   },
   methods: {
-    upload() {
+    upload(e) {
       this.is_dragover = false;
+      const { files } = e.dataTransfer;
+      console.log(files);
     },
   },
 };
