@@ -69,7 +69,7 @@ export default {
   methods: {
     upload(e) {
       this.is_dragover = false;
-      const { files } = e.dataTransfer;
+      const files = [...e.dataTransfer.files];
       console.log(files);
     },
   },
