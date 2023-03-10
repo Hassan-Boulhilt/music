@@ -59,6 +59,7 @@
   </div>
 </template>
 <script>
+import { storage, ref, uploadBytes } from "@/includes/firebase";
 export default {
   name: "Upload",
   data() {
@@ -67,10 +68,17 @@ export default {
     };
   },
   methods: {
-    upload(e) {
+    upload($event) {
       this.is_dragover = false;
-      const files = [...e.dataTransfer.files];
-      console.log(files);
+      const files = [...$event.dataTransfer.files];
+      files.forEach((file) => {
+        if (file.type !== "audio/mpeg") {
+          return;
+        }
+
+        const fileRef = ref(storage, `songs/${file.name}`);
+        uploadBytes(fileRef, file);
+      });
     },
   },
 };

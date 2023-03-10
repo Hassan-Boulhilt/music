@@ -1,5 +1,14 @@
 import { defineStore } from "pinia";
-import { auth, usersCollection } from "@/includes/firebase";
+import {
+  auth,
+  usersCollection,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  doc,
+  setDoc,
+  updateProfile,
+} from "@/includes/firebase";
 
 export default defineStore("user", {
   state: () => ({
@@ -7,31 +16,32 @@ export default defineStore("user", {
   }),
   actions: {
     async register(values) {
-      const userCred = await auth.createUserWithEmailAndPassword(
+      const userCred = await createUserWithEmailAndPassword(
+        auth,
         values.email,
         values.password
       );
 
-      await usersCollection.doc(userCred.user.uid).set({
+      await setDoc(doc(usersCollection, userCred.user.uid), {
         name: values.name,
         email: values.email,
         age: values.age,
         country: values.country,
       });
 
-      await userCred.user.updateProfile({
+      await updateProfile(userCred.user, {
         displayName: values.name,
       });
 
       this.userLoggedIn = true;
     },
     async authenticate(values) {
-      await auth.signInWithEmailAndPassword(values.email, values.password);
+      await signInWithEmailAndPassword(auth, values.email, values.password);
 
       this.userLoggedIn = true;
     },
     async signOut() {
-      await auth.signOut();
+      await signOut(auth);
 
       this.userLoggedIn = false;
     },
