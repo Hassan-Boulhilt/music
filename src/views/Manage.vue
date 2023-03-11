@@ -134,10 +134,14 @@
 import AppUpload from "@/components/Upload.vue";
 
 export default {
-  name: "Manage",
+  name: "manage",
   components: {
     AppUpload,
   },
+  // beforeRouteLeave(to, from, next) {
+  //   this.$refs.upload.cancelUploads();
+  //   next();
+  // },
   // beforeRouteEnter(to, from, next) {
   //   const store = useUserStore();
 

@@ -10,8 +10,7 @@
         <div
           class="w-full px-10 py-20 rounded text-center cursor-pointer border border-dashed border-gray-400 text-gray-400 transition duration-500 hover:text-white hover:bg-green-400 hover:border-green-400 hover:border-solid"
           :class="{
-            'bg-green-400 text-white border-green-400 border-solid':
-              is_dragover,
+            'bg-green-400 text-white border-green-400 border-solid': is_dragover,
           }"
           @drag.prevent.stop=""
           @dragstart.prevent.stop=""
@@ -91,8 +90,7 @@ export default {
         uploadTask.on(
           "state_changed",
           (snapshot) => {
-            const progress =
-              (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
             this.uploads[uploadIndex].current_progress = progress;
           },
           (error) => {
@@ -122,6 +120,11 @@ export default {
       });
     },
   },
+  // // cancelUploads() {
+  // //   this.uploads.forEach((upload) => {
+  // //     upload.uploadTask.cancel();
+  // //   });
+  // },
   beforeUnmount() {
     this.uploads.forEach((upload) => {
       upload.uploadTask.cancel();
