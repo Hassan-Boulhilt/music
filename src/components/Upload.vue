@@ -23,35 +23,23 @@
         >
           <h5>Drop your files here</h5>
         </div>
+        <input type="file" multiple @change="upload($event)" />
         <hr class="my-6" />
         <!-- Progess Bars -->
-        <div class="mb-4">
-          <!-- File Name -->
-          <div class="font-bold text-sm">Just another song.mp3</div>
-          <div class="flex h-4 overflow-hidden bg-gray-200 rounded">
-            <!-- Inner Progress Bar -->
-            <div
-              class="transition-all progress-bar bg-blue-400"
-              style="width: 75%"
-            ></div>
-          </div>
-        </div>
-        <div class="mb-4">
-          <div class="font-bold text-sm">Just another song.mp3</div>
-          <div class="flex h-4 overflow-hidden bg-gray-200 rounded">
-            <div
-              class="transition-all progress-bar bg-blue-400"
-              style="width: 35%"
-            ></div>
-          </div>
-        </div>
-        <div class="mb-4">
-          <div class="font-bold text-sm">Just another song.mp3</div>
-          <div class="flex h-4 overflow-hidden bg-gray-200 rounded">
-            <div
-              class="transition-all progress-bar bg-blue-400"
-              style="width: 55%"
-            ></div>
+        <div v-for="upload in uploads" :key="upload.name">
+          <div class="mb-4">
+            <!-- File Name -->
+            <div class="font-bold text-sm" :class="upload.text_color">
+              <i :class="upload.icon"></i> {{ upload.name }}
+            </div>
+            <div class="flex h-4 overflow-hidden bg-gray-200 rounded">
+              <!-- Inner Progress Bar -->
+              <div
+                class="transition-all progress-bar"
+                :class="upload.variant"
+                :style="{ width: upload.current_progress + '%' }"
+              ></div>
+            </div>
           </div>
         </div>
       </div>
@@ -59,25 +47,78 @@
   </div>
 </template>
 <script>
-import { storage, ref, uploadBytes } from "@/includes/firebase";
+import {
+  storage,
+  ref,
+  uploadBytesResumable,
+  auth,
+  songsCollection,
+  addDoc,
+  getDownloadURL,
+} from "@/includes/firebase";
+import { getAuth } from "@firebase/auth";
 export default {
   name: "Upload",
   data() {
     return {
       is_dragover: false,
+      uploads: [],
     };
   },
   methods: {
     upload($event) {
       this.is_dragover = false;
-      const files = [...$event.dataTransfer.files];
+      const files = $event.dataTransfer
+        ? [...$event.dataTransfer.files]
+        : [...$event.target.files];
       files.forEach((file) => {
         if (file.type !== "audio/mpeg") {
           return;
         }
 
         const fileRef = ref(storage, `songs/${file.name}`);
-        uploadBytes(fileRef, file);
+        const uploadTask = uploadBytesResumable(fileRef, file);
+        const uploadIndex =
+          this.uploads.push({
+            name: file.name,
+            uploadTask,
+            current_progress: 0,
+            variant: "bg-blue-400",
+            icon: "fas fa-spinner fa-spin",
+            text_color: "",
+          }) - 1;
+
+        uploadTask.on(
+          "state_changed",
+          (snapshot) => {
+            const progress =
+              (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            this.uploads[uploadIndex].current_progress = progress;
+          },
+          (error) => {
+            this.uploads[uploadIndex].variant = "bg-red-400";
+            this.uploads[uploadIndex].icon = "fas fa-exclamation-triangle";
+            this.uploads[uploadIndex].text_color = "text-red-400";
+            console.log(error);
+          },
+          async () => {
+            const song = {
+              uid: auth.currentUser.uid,
+              display_name: getAuth().currentUser.displayName,
+              original_name: uploadTask.snapshot.ref.name,
+              modified_name: uploadTask.snapshot.ref.name,
+              genre: "",
+              comment_count: 0,
+            };
+
+            song.url = await getDownloadURL(uploadTask.snapshot.ref);
+
+            await addDoc(songsCollection, song);
+            this.uploads[uploadIndex].variant = "bg-green-400";
+            this.uploads[uploadIndex].icon = "fas fa-check";
+            this.uploads[uploadIndex].text_color = "text-green-400";
+          }
+        );
       });
     },
   },

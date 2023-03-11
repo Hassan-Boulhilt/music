@@ -1,7 +1,18 @@
 import firebase from "firebase/compat/app";
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, doc, setDoc } from "firebase/firestore";
-import { getStorage, ref, uploadBytes } from "firebase/storage";
+import {
+  getFirestore,
+  collection,
+  doc,
+  setDoc,
+  addDoc,
+} from "firebase/firestore";
+import {
+  getStorage,
+  ref,
+  uploadBytesResumable,
+  getDownloadURL,
+} from "firebase/storage";
 import {
   getAuth,
   createUserWithEmailAndPassword,
@@ -25,6 +36,7 @@ const appFirebase = initializeApp(firebaseConfig);
 const auth = getAuth(appFirebase);
 const db = getFirestore(appFirebase);
 const usersCollection = collection(db, "users");
+const songsCollection = collection(db, "songs");
 const storage = getStorage(appFirebase);
 
 export {
@@ -35,9 +47,12 @@ export {
   signInWithEmailAndPassword,
   doc,
   setDoc,
+  addDoc,
   updateProfile,
   signOut,
   storage,
   ref,
-  uploadBytes,
+  uploadBytesResumable,
+  songsCollection,
+  getDownloadURL,
 };
