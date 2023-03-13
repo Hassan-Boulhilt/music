@@ -132,11 +132,15 @@
 <script>
 // import useUserStore from "@/stores/user";
 import AppUpload from "@/components/Upload.vue";
+import { songCollection, auth } from "@/firebase";
 
 export default {
   name: "manage",
   components: {
     AppUpload,
+  },
+  async created() {
+    await songCollection.where("uid", "==", auth.currentUser.uid);
   },
   // beforeRouteLeave(to, from, next) {
   //   this.$refs.upload.cancelUploads();
