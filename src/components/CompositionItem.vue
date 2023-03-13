@@ -10,29 +10,36 @@
         </button>
         <button
           class="ml-1 py-1 px-2 text-sm rounded text-white bg-blue-600 float-right"
-          @click="isEditing = true"
+          @click.prevent="isEditing = true"
         >
           <i class="fa fa-pencil-alt"></i>
         </button>
       </div>
       <div v-show="isEditing">
-        <form>
+        <vee-form @submit="submitSong" :validation-schema="songSchema">
           <div class="mb-3">
             <label class="inline-block mb-2">Song Title</label>
-            <input
+            <vee-field
+              name="title"
               type="text"
               class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded"
               placeholder="Enter Song Title"
             />
           </div>
+          <ErrorMessage class="text-red-600" name="title" />
           <div class="mb-3">
             <label class="inline-block mb-2">Song Genre</label>
-            <input
+            <vee-field
+              name="genre"
               type="text"
               class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded"
               placeholder="Enter Genre"
             />
           </div>
+          <div>
+            <ErrorMessage class="text-red-600" name="genre" />
+          </div>
+
           <button
             type="submit"
             class="py-1.5 px-3 rounded text-white bg-green-600"
@@ -46,13 +53,15 @@
           >
             Go Back
           </button>
-        </form>
+        </vee-form>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { auth, songsCollection } from "@/includes/firebase";
+import { updateDoc, doc } from "firebase/firestore";
 export default {
   name: "CompositionItem",
   props: {
@@ -64,7 +73,20 @@ export default {
   data() {
     return {
       isEditing: false,
+      songSchema: {
+        title: "required|min:3|max:50",
+        genre: "required|min:3|max:50",
+      },
     };
+  },
+  methods: {
+    async submitSong(values) {
+      console.log(values);
+      await updateDoc(doc(songsCollection, doc.id), {
+        original_name: values.title,
+        genre: values.genre,
+      });
+    },
   },
 };
 </script>
