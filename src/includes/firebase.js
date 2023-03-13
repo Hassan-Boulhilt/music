@@ -5,7 +5,10 @@ import {
   collection,
   doc,
   setDoc,
+  getDocs,
   addDoc,
+  where,
+  query,
 } from "firebase/firestore";
 import {
   getStorage,
@@ -47,6 +50,7 @@ export {
   signInWithEmailAndPassword,
   doc,
   setDoc,
+  getDocs,
   addDoc,
   updateProfile,
   signOut,
@@ -55,4 +59,6 @@ export {
   uploadBytesResumable,
   songsCollection,
   getDownloadURL,
+  where,
+  query,
 };
