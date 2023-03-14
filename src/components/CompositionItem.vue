@@ -80,6 +80,7 @@ import {
   songsCollection,
   storage,
   deleteObject,
+  deleteDoc,
   ref,
   updateDoc,
   doc,
@@ -147,8 +148,9 @@ export default {
       this.alert_variant = "bg-blue-500";
       this.alert_message = "Please wait! Deleting song";
       try {
-        const songRef = ref(storage, `${this.song.modified_name}`);
-        await deleteObject(storage, songRef.fullPath());
+        const songRef = ref(storage, `songs/${this.song.original_name}`);
+        await deleteObject(songRef);
+        await deleteDoc(doc(songsCollection, this.song.docId));
       } catch (error) {
         this.show_alert = true;
         this.alert_variant = "bg-red-500";
