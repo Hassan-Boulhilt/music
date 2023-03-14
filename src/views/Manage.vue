@@ -20,6 +20,7 @@
               :key="song.docId"
               :song="song"
               :updateSong="updateSong"
+              :updateSongd="updateSongd"
               :index="i"
             />
           </div>
@@ -69,6 +70,9 @@ export default {
     updateSong(i, values) {
       this.songs[i].modified_name = values.modified_name;
       this.songs[i].genre = values.genre;
+    },
+    updateSongd(i) {
+      this.songs.splice(i, 1);
     },
     // async deleteSong(song) {
     //   const index = this.songs.indexOf(song);

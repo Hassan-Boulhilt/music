@@ -1,5 +1,12 @@
 <template>
   <div>
+    <div
+      class="text-white text-center font-bold p-4 rounded mb-4"
+      v-if="show_alert"
+      :class="alert_variant"
+    >
+      {{ alert_message }}
+    </div>
     <div class="border border-gray-200 p-3 mb-4 rounded">
       <div v-show="!isEditing">
         <h4 class="inline-block text-2xl font-bold">
@@ -7,6 +14,7 @@
         </h4>
         <button
           class="ml-1 py-1 px-2 text-sm rounded text-white bg-red-600 float-right"
+          @click="deleteSong"
         >
           <i class="fa fa-times"></i>
         </button>
@@ -18,13 +26,6 @@
         </button>
       </div>
       <div v-show="isEditing">
-        <div
-          class="text-white text-center font-bold p-4 rounded mb-4"
-          v-if="show_alert"
-          :class="alert_variant"
-        >
-          {{ alert_message }}
-        </div>
         <vee-form
           @submit="submitSong"
           :validation-schema="songSchema"
@@ -75,8 +76,15 @@
 </template>
 
 <script>
-import { songsCollection } from "@/includes/firebase";
-import { updateDoc, doc } from "firebase/firestore";
+import {
+  songsCollection,
+  storage,
+  deleteObject,
+  ref,
+  updateDoc,
+  doc,
+} from "@/includes/firebase";
+
 export default {
   name: "CompositionItem",
   props: {
@@ -90,6 +98,10 @@ export default {
     },
     index: {
       type: Number,
+      required: true,
+    },
+    updateSongd: {
+      type: Function,
       required: true,
     },
   },
@@ -128,6 +140,23 @@ export default {
       this.in_submission = false;
       this.alert_variant = "bg-green-500";
       this.alert_message = "Song information updated successfully";
+    },
+    async deleteSong() {
+      this.updateSongd(this.index);
+      this.show_alert = true;
+      this.alert_variant = "bg-blue-500";
+      this.alert_message = "Please wait! Deleting song";
+      try {
+        const songRef = ref(storage, `${this.song.modified_name}`);
+        await deleteObject(storage, songRef.fullPath());
+      } catch (error) {
+        this.show_alert = true;
+        this.alert_variant = "bg-red-500";
+        this.alert_message = "Error deleting song";
+        return;
+      }
+      this.alert_variant = "bg-green-500";
+      this.alert_message = "Song deleted successfully";
     },
   },
 };

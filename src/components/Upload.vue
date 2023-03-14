@@ -63,6 +63,7 @@ export default {
     return {
       is_dragover: false,
       uploads: [],
+      done: false,
     };
   },
   methods: {

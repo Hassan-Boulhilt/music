@@ -17,6 +17,7 @@ import {
   ref,
   uploadBytesResumable,
   getDownloadURL,
+  deleteObject,
 } from "firebase/storage";
 import {
   getAuth,
@@ -65,4 +66,5 @@ export {
   getDownloadURL,
   where,
   query,
+  deleteObject,
 };
