@@ -8,6 +8,7 @@ import {
   setDoc,
   getDocs,
   addDoc,
+  getDoc,
   where,
   query,
 } from "firebase/firestore";
@@ -52,6 +53,7 @@ export {
   doc,
   updateDoc,
   setDoc,
+  getDoc,
   getDocs,
   addDoc,
   updateProfile,

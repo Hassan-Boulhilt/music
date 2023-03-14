@@ -2,7 +2,9 @@
   <div>
     <div class="border border-gray-200 p-3 mb-4 rounded">
       <div v-show="!isEditing">
-        <h4 class="inline-block text-2xl font-bold">Song Name</h4>
+        <h4 class="inline-block text-2xl font-bold">
+          {{ song.original_name }}
+        </h4>
         <button
           class="ml-1 py-1 px-2 text-sm rounded text-white bg-red-600 float-right"
         >
@@ -16,7 +18,11 @@
         </button>
       </div>
       <div v-show="isEditing">
-        <vee-form @submit="submitSong" :validation-schema="songSchema">
+        <vee-form
+          @submit="submitSong"
+          :validation-schema="songSchema"
+          :initial-values="song"
+        >
           <div class="mb-3">
             <label class="inline-block mb-2">Song Title</label>
             <vee-field
@@ -60,7 +66,7 @@
 </template>
 
 <script>
-import { auth, songsCollection } from "@/includes/firebase";
+import { songsCollection } from "@/includes/firebase";
 import { updateDoc, doc } from "firebase/firestore";
 export default {
   name: "CompositionItem",
@@ -81,8 +87,7 @@ export default {
   },
   methods: {
     async submitSong(values) {
-      console.log(values);
-      await updateDoc(doc(songsCollection, doc.id), {
+      await updateDoc(doc(songsCollection, this.song.docId), {
         original_name: values.title,
         genre: values.genre,
       });
