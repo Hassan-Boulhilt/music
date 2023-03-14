@@ -16,9 +16,11 @@
           <div class="p-6">
             <!-- Composition Items -->
             <composition-item
-              v-for="song in songs"
+              v-for="(song, i) in songs"
               :key="song.docId"
               :song="song"
+              :updateSong="updateSong"
+              :index="i"
             />
           </div>
         </div>
@@ -62,6 +64,16 @@ export default {
       };
       this.songs.push(song);
     });
+  },
+  methods: {
+    updateSong(i, values) {
+      this.songs[i].modified_name = values.modified_name;
+      this.songs[i].genre = values.genre;
+    },
+    // async deleteSong(song) {
+    //   const index = this.songs.indexOf(song);
+    //   this.songs.splice(index, 1);
+    // },
   },
   // beforeRouteLeave(to, from, next) {
   //   this.$refs.upload.cancelUploads();
