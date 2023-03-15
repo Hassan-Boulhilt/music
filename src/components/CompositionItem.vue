@@ -38,6 +38,7 @@
               type="text"
               class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded"
               placeholder="Enter Song Title"
+              @input="updateUnsaveFlag(true)"
             />
           </div>
           <ErrorMessage class="text-red-600" name="modified_name" />
@@ -47,7 +48,9 @@
               name="genre"
               type="text"
               class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded"
-              placeholder="Enter Genre"
+              placeholder="Enter
+            Genre"
+              @input="updateUnsaveFlag(true)"
             />
           </div>
           <div>
@@ -101,9 +104,12 @@ export default {
       type: Number,
       required: true,
     },
-    updateSongd: {
+    removeSong: {
       type: Function,
       required: true,
+    },
+    updateUnsaveFlag: {
+      type: Function,
     },
   },
   data() {
@@ -138,27 +144,16 @@ export default {
         return;
       }
       this.updateSong(this.index, values);
+      this.updateUnsaveFlag(false);
       this.in_submission = false;
       this.alert_variant = "bg-green-500";
       this.alert_message = "Song information updated successfully";
     },
     async deleteSong() {
-      this.updateSongd(this.index);
-      this.show_alert = true;
-      this.alert_variant = "bg-blue-500";
-      this.alert_message = "Please wait! Deleting song";
-      try {
-        const songRef = ref(storage, `songs/${this.song.original_name}`);
-        await deleteObject(songRef);
-        await deleteDoc(doc(songsCollection, this.song.docId));
-      } catch (error) {
-        this.show_alert = true;
-        this.alert_variant = "bg-red-500";
-        this.alert_message = "Error deleting song";
-        return;
-      }
-      this.alert_variant = "bg-green-500";
-      this.alert_message = "Song deleted successfully";
+      const songRef = ref(storage, `songs/${this.song.original_name}`);
+      await deleteObject(songRef);
+      await deleteDoc(doc(songsCollection, this.song.docId));
+      this.removeSong(this.index);
     },
   },
 };

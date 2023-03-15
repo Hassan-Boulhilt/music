@@ -2,7 +2,7 @@
   <!-- Main Content -->
   <section class="container mx-auto mt-6">
     <div class="md:grid md:grid-cols-3 md:gap-4">
-      <app-upload />
+      <app-upload :addSong="addSong" />
       <div class="col-span-2">
         <div
           class="bg-white rounded border border-gray-200 relative flex flex-col"
@@ -20,8 +20,9 @@
               :key="song.docId"
               :song="song"
               :updateSong="updateSong"
-              :updateSongd="updateSongd"
+              :removeSong="removeSong"
               :index="i"
+              :updateUnsaveFlag="updateUnsaveFlag"
             />
           </div>
         </div>
@@ -51,6 +52,7 @@ export default {
   data() {
     return {
       songs: [],
+      unsaveFlag: false,
     };
   },
   async created() {
@@ -58,39 +60,40 @@ export default {
       query(songsCollection, where("uid", "==", auth.currentUser.uid))
     );
 
-    snapchat.forEach((doc) => {
-      const song = {
-        docId: doc.id,
-        ...doc.data(),
-      };
-      this.songs.push(song);
-    });
+    snapchat.forEach(this.addSong);
   },
   methods: {
     updateSong(i, values) {
       this.songs[i].modified_name = values.modified_name;
       this.songs[i].genre = values.genre;
     },
-    updateSongd(i) {
+    removeSong(i) {
       this.songs.splice(i, 1);
     },
-    // async deleteSong(song) {
-    //   const index = this.songs.indexOf(song);
-    //   this.songs.splice(index, 1);
-    // },
+    addSong(doc) {
+      const song = {
+        docId: doc.id,
+        ...doc.data(),
+      };
+      this.songs.push(song);
+    },
+    updateUnsaveFlag(value) {
+      this.unsaveFlag = value;
+    },
   },
-  // beforeRouteLeave(to, from, next) {
-  //   this.$refs.upload.cancelUploads();
-  //   next();
-  // },
-  // beforeRouteEnter(to, from, next) {
-  //   const store = useUserStore();
-
-  //   if (store.userLoggedIn) {
-  //     next();
-  //   } else {
-  //     next({ name: "home" });
-  //   }
-  // },
+  beforeRouteLeave(to, from, next) {
+    if (this.unsaveFlag) {
+      const answer = window.confirm(
+        "You have unsaved changes. Are you sure you want to leave?"
+      );
+      if (answer) {
+        next();
+      } else {
+        next(false);
+      }
+    } else {
+      next();
+    }
+  },
 };
 </script>
