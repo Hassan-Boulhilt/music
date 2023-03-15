@@ -54,13 +54,36 @@ export default {
     };
   },
   async created() {
-    const snapshots = await getDocs(songsCollection);
-    snapshots.forEach((doc) => {
-      this.songs.push({
-        docId: doc.id,
-        ...doc.data(),
+    this.getSongs();
+
+    window.addEventListener("scroll", this.handleScroll);
+  },
+  beforeUnmount() {
+    window.removeEventListener("scroll", this.handleScroll);
+  },
+  methods: {
+    handleScroll() {
+      const scrollTop =
+        window.pageYOffset !== undefined
+          ? window.pageYOffset
+          : (document.documentElement || document.body.parentNode || document.body)
+              .scrollTop;
+
+      if (scrollTop > 100) {
+        document.getElementById("header").classList.add("fixed");
+      } else {
+        document.getElementById("header").classList.remove("fixed");
+      }
+    },
+    async getSongs() {
+      const snapshots = await getDocs(songsCollection);
+      snapshots.forEach((doc) => {
+        this.songs.push({
+          docId: doc.id,
+          ...doc.data(),
+        });
       });
-    });
+    },
   },
 };
 </script>
