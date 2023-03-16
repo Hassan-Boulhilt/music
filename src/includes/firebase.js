@@ -12,6 +12,9 @@ import {
   deleteDoc,
   where,
   query,
+  limit,
+  startAfter,
+  orderBy,
 } from "firebase/firestore";
 import {
   getStorage,
@@ -69,4 +72,7 @@ export {
   query,
   deleteObject,
   deleteDoc,
+  limit,
+  startAfter,
+  orderBy,
 };

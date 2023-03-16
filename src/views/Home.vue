@@ -9,10 +9,10 @@
       <div class="text-white main-header-content">
         <h1 class="font-bold text-5xl mb-5">Listen to Great Music!</h1>
         <p class="w-full md:w-8/12 mx-auto">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus et dolor
-          mollis, congue augue non, venenatis elit. Nunc justo eros, suscipit ac aliquet
-          imperdiet, venenatis et sapien. Duis sed magna pulvinar, fringilla lorem eget,
-          ullamcorper urna.
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus et
+          dolor mollis, congue augue non, venenatis elit. Nunc justo eros,
+          suscipit ac aliquet imperdiet, venenatis et sapien. Duis sed magna
+          pulvinar, fringilla lorem eget, ullamcorper urna.
         </p>
       </div>
     </div>
@@ -40,8 +40,16 @@
   </section>
 </template>
 <script>
-import { songsCollection, getDocs } from "@/includes/firebase.js";
+import {
+  songsCollection,
+  getDocs,
+  limit,
+  getDoc,
+  doc,
+  startAfter,
+} from "@/includes/firebase.js";
 import SongItem from "@/components/SongItem.vue";
+import {} from "@firebase/firestore";
 
 export default {
   name: "Home",
@@ -51,6 +59,7 @@ export default {
   data() {
     return {
       songs: [],
+      maxPerPage: 3,
     };
   },
   async created() {
@@ -63,20 +72,26 @@ export default {
   },
   methods: {
     handleScroll() {
-      const scrollTop =
-        window.pageYOffset !== undefined
-          ? window.pageYOffset
-          : (document.documentElement || document.body.parentNode || document.body)
-              .scrollTop;
+      const { scrollTop, scrollHeight } = document.documentElement;
+      const { innerHeight } = window;
+      const bottomOfWindow =
+        Math.round(scrollTop) + innerHeight > scrollHeight - 100;
 
-      if (scrollTop > 100) {
-        document.getElementById("header").classList.add("fixed");
-      } else {
-        document.getElementById("header").classList.remove("fixed");
+      if (bottomOfWindow) {
+        this.getSongs();
       }
     },
     async getSongs() {
-      const snapshots = await getDocs(songsCollection);
+      const lastDoc = await getDocs(
+        songsCollection,
+        this.songs[this.songs.length - 1]
+      );
+
+      const snapshots = await getDocs(
+        songsCollection,
+        limit(this.maxPerPage),
+        startAfter(lastDoc)
+      );
       snapshots.forEach((doc) => {
         this.songs.push({
           docId: doc.id,
